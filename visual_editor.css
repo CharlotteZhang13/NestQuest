@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+}
+
+.horizontal {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.slist {
+    list-style: none;
+    background: #f5f5f5;
+}
+
+li {
+    background: #d7caf9;
+    padding: 0px;
+}
+
+.element {
+    width: fit-content;
+    margin: 5px;
+    padding: 8px;
+    border: 2px solid #726d6d;
+    border-radius: 10px;
+}
+
+.element .placeholder {
+    width: fit-content;
+    border: 2px solid #726d6d;
+    background: #f5f5f5;
+    color: #bebbbb;
+}
+
+.element .hint {
+    border: 1px solid #ffc49a;
+    background: #feffb4;
+}
+
+.element .active {
+    border: 1px solid #ffa5a5;
+    background: #ffe7e7;
+}
+
+#trash {
+    text-align: center;
+    width: auto;
+    margin: 5px;
+    padding: 8px;
+    border: 2px solid #726d6d;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+#trash.active {
+    border: 1px solid #ffa5a5;
+    background: #ffe7e7;
+}
+
+.editable {
+    min-width: 60px;
+    min-height: 12px;
+    background: rgb(253, 255, 231);
+    border: 2px solid #726d6d;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+.editable .hint{
+    border: 1px solid #ffa5a5;
+    background: #feffb4;
+}
+
+.editable .active {
+    border: 1px solid #ffa5a5;
+    background: #ffe7e7;
+}
+
+#display {
+    margin-left: 200px;
+    font-size: 50px;
+}
+
+.dropdown {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 1px;
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background-color: #f8e9f7;
+    color: rgb(73, 71, 73);
+    font-size: 16px;
+    cursor: pointer;
+    border: 2px solid #726d6d;
+    border-radius: 4px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f8e9f7;
+    min-width: 80px;
+    border: 2px solid #726d6d;
+    border-radius: 4px;
+    z-index: auto;
+}
+
+.dropdown-content a {
+    color: rgb(73, 71, 73);
+    font-size: 16px;
+    padding: 6px 8px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f5c0f0
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    z-index: 20;
+}
