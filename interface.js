@@ -30,7 +30,6 @@ function setDropdowns() {
             dropa.addEventListener("click", function () {
                 dropbtn = dropd.querySelector(".dropbtn");
                 dropbtn.textContent = dropa.textContent;
-                console.log(dropbtn.textContent);
             });
         });
     });
@@ -38,7 +37,7 @@ function setDropdowns() {
 
 //给列表元素添加placeholder，这样可以往placeholder上拖元素
 function setSlistPlaceholders(target) {
-    if (target.id == "menu" || target.id == "trash") return;
+    if (target.id == "menu" || target.id == "trash" || target.id == "var_menu") return;
     var placeHolder = document.createElement("li");
     placeHolder.textContent = "Add code blocs to above...";
     placeHolder.classList.add("element");
@@ -255,6 +254,23 @@ function setSlistTriggers(target) {
     }
 }
 
+function addVar(){
+    var addVarBtn = document.getElementById("add_var");
+    addVarBtn.addEventListener("click", function () {
+        var cloned = addVarBtn.previousElementSibling.cloneNode(true);
+        var name = cloned.querySelector(".name");
+        name.textContent = parseFloat(addVarBtn.previousElementSibling.textContent) + 1;
+        addVarBtn.parentNode.appendChild(cloned);
+        addVarBtn.parentNode.insertBefore(cloned, addVarBtn);
+
+        setDropdowns();
+        slistAll = document.querySelectorAll(".slist")
+        slistAll.forEach(slist => {
+            setSlistTriggers(slist);
+        })
+    });
+} 
+
 slistAll.forEach(slist => {
     setSlistPlaceholders(slist);
     setSlistTriggers(slist);
@@ -262,3 +278,4 @@ slistAll.forEach(slist => {
 })
 setTrashTriggers(trashDiv);
 setEditable();
+addVar();

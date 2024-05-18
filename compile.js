@@ -34,9 +34,15 @@ function readTokens(item) {
         func.name = "if";
         editable = item.querySelectorAll(".editable");
         sign = item.querySelector(".sign");
-        func.val_01 = parseFloat(editable[0].textContent);
-        func.val_02 = sign.textContent;
-        func.val_03 = parseFloat(editable[1].textContent);
+        if(sign == null){
+            func.val_01 = 1;
+            func.val_02 = "==";
+            func.val_03 = 1;
+        }else {
+            func.val_01 = parseFloat(editable[0].textContent);
+            func.val_02 = sign.textContent;
+            func.val_03 = parseFloat(editable[1].textContent);
+        }
     }
 
     return func;

@@ -30,7 +30,10 @@
     <div class="horizontal">
         <div>
             <ul class="slist element" id="menu">
-                Drag to right
+                Code blocs
+                <li class="element add">
+                    break
+                </li>
                 <li class="element add">
                     <div class="horizontal ignore">
                         <p class="ignore">Add :</p>
@@ -46,13 +49,13 @@
                 <ul class="slist element while">
                     <div class="horizontal ignore">
                         <p class="ignore">while :</p>
-                        <p class="editable" contenteditable="true">500</p>
+                        <p class="editable">true</p>
                     </div>
                 </ul>
                 <ul class="slist element if">
                     <div class="horizontal ignore">
                         <p class="ignore">if :</p>
-                        <p class="editable" contenteditable="true">500</p>
+                        <p class="editable">true</p>
                     </div>
                 </ul>
                 <ul class="slist element for">
@@ -101,6 +104,24 @@
                 </svg>
             </div>
         </div>
+        <ul class="slist element" id="var_menu">
+            <p>Variables</p>
+            <div class="var_horizontal">
+                <li class="var element bool">
+                    <p class="name">0</p>
+                </li>
+                <div class="dropdown">
+                    <button class="dropbtn sign">number</button>
+                    <div class="dropdown-content">
+                        <a class="item">number</a>
+                        <a class="item">bool</a>
+                        <a class="item">string</a>
+                    </div>
+                </div>
+                <p class="editable" contenteditable="true">100</p>
+            </div>
+            <button id="add_var">Add variable</button>
+        </ul>
         <ul class="slist element" id="main">
             main
         </ul>
