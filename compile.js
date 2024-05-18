@@ -8,10 +8,12 @@ var displayDiv = document.getElementById("display");
 var forcestop = false;
 
 function readTokens(item) {
+
     var func = {
         name: null,
         val_01: 0,
-        val_02: 0
+        val_02: 0,
+        val_03: 0
     };
 
     if (item.classList.contains("while")) {
@@ -28,6 +30,15 @@ function readTokens(item) {
         func.name = "wait";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
+    } else if(item.classList.contains("bool")) {
+        func.name = "bool";
+        editable = item.querySelectorAll(".editable");
+        sign = item.querySelector(".sign");
+        func.val_01 = parseFloat(editable[0].textContent);
+        func.val_02 = sign.textContent;
+        func.val_03 = parseFloat(editable[1].textContent);
+    } else if(item.classList.contains("if")) {
+        func.name = "if";
     }
 
     return func;
@@ -39,7 +50,7 @@ function tokenize(target) {
     for (let item of items) {
         if (item.classList.contains("placeholder")) break;
         var func = readTokens(item);
-        funcTokens.push(func);
+        if(func.name != null) funcTokens.push(func);
         if (item.tagName == "UL") {
             tokenize(item);
         }
@@ -65,7 +76,6 @@ function func_combiner(fn) {
         fn.apply(this, arguments);
     }
 }
-
 
 function func_add(incre) {
     displayNum += incre;
@@ -128,6 +138,12 @@ function func_for(n) {
     t_idx = t2 + 1;
 }
 
+function func_if(){
+    if(runTokens()){
+
+    }
+}
+
 function runTokens() {
 
     var token = funcTokens[t_idx];
@@ -146,6 +162,8 @@ function runTokens() {
         }, timeout);
     } else if (token.name == "wait") {
         func_combiner(func_wait)(token.val_01);
+    } else if (token.name == "bool"){
+        return func_bool(token.val_01, token.val_02, token.val_03);
     }
 
     return 1;

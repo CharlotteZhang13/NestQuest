@@ -125,14 +125,17 @@ function setTrashTriggers(target) {
         e.preventDefault();
 
         if (currentItem.classList.contains("bool")) {
-            var parent = currentItem.parentNode;
-            var directChildren = parent.children;
-            for (var j = 0; j < directChildren.length; j++) {
-                var child = directChildren[j];
-                if (child.classList.contains("editable")) previousEditable = child;
+            sibling = currentItem.nextSibling;
+            while (sibling && sibling.nodeType !== 1) { 
+                sibling = sibling.nextSibling;
             }
+            if(sibling != null && sibling.classList.contains("editable")){
+                previousEditable = sibling;
+            } else {
+                previousEditable = null;
+            }
+
             if (previousEditable != null) previousEditable.style.display = "block";
-            previousEditable = null;
         }
 
         target.classList.remove("active");
