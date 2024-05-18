@@ -1,4 +1,5 @@
 var funcTokens = [];
+var varList = [];
 var t_idx = 0;
 var timeout = 0;
 var displayNum = 0;
@@ -6,6 +7,23 @@ var runButton = document.getElementById("run");
 var stopButton = document.getElementById("stop");
 var displayDiv = document.getElementById("display");
 var forcestop = false;
+
+function readVar() {
+    varAll = document.querySelectorAll(".var_horizontal");
+    idx = 0;
+    varAll.forEach(v => {
+        var vstruct = {
+            name: null,
+            val: 0,
+            idx: 0,
+        };
+
+        vstruct.name = v.querySelector(".name").textContent;
+        vstruct.val = parseFloat(v.querySelector(".editable").textContent);
+        vstruct.idx = idx++;
+        varList.push(vstruct);
+    });
+}
 
 function readTokens(item) {
 
@@ -32,16 +50,26 @@ function readTokens(item) {
         func.val_01 = parseFloat(editable.textContent);
     } else if (item.classList.contains("if")) {
         func.name = "if";
-        editable = item.querySelectorAll(".editable");
         sign = item.querySelector(".sign");
-        if(sign == null){
+        if (sign == null) {
             func.val_01 = 1;
             func.val_02 = "==";
             func.val_03 = 1;
-        }else {
-            func.val_01 = parseFloat(editable[0].textContent);
+        } else {
+            first = item.querySelector(".bool").children[0];
             func.val_02 = sign.textContent;
-            func.val_03 = parseFloat(editable[1].textContent);
+            second = item.querySelector(".dropdown").nextElementSibling;
+            if (first.classList.contains("editable")) {
+                func.val_01 = parseFloat(first.textContent);
+            } else {
+                var x = first.querySelector(".name").textContent;
+                func.val_01 = varList[x - '0'];
+            }
+            if (second.classList.contains("editable")) {
+                func.val_03 = parseFloat(second.textContent);
+            } else {
+                func.val_03 = varList[parseInt(second.querySelector(".name").textContent)];
+            }
         }
     }
 
@@ -87,7 +115,6 @@ function func_add(incre) {
 }
 
 function func_wait(time) {
-    console.log(timeout);
     timeout += time;
 }
 
@@ -127,7 +154,7 @@ function func_while() {
 
 function func_for(n) {
     if (n == 0) {
-        while(funcTokens[t_idx].name != "end"){
+        while (funcTokens[t_idx].name != "end") {
             t_idx++;
         };
         t_idx++;
@@ -161,6 +188,13 @@ function read_bool(n1, n2, s) {
 }
 
 function func_if(n1, n2, s) {
+    if (typeof n1 == "object") {
+        n1 = varList[n1.idx].val;
+    }
+    if (typeof n2 == "object") {
+        n2 = varList[n2.idx].val;
+    }
+
     if (read_bool(n1, n2, s)) {
         func_for(1);
     } else {
@@ -168,13 +202,12 @@ function func_if(n1, n2, s) {
     }
 }
 
-
-
 function runTokens() {
 
     var token = funcTokens[t_idx];
     t_idx++;
     timeout += 4;
+    displayDiv.innerText = displayNum;
 
     if (token.name == "while") {
         func_combiner(func_while)();
@@ -196,20 +229,23 @@ function runTokens() {
 }
 
 runButton.addEventListener("click", function () {
+    funcTokens = [];
+    varList = [];
+    t_idx = 0;
+    timeout = 0;
+    displayNum = 0;
+
+    readVar();
     tokenize(mainSlist);
     while (t_idx < funcTokens.length) {
         runTokens();
     }
-
-    funcTokens = [];
-    t_idx = 0;
-    timeout = 0;
-    displayNum = 0;
 });
 
 stopButton.addEventListener("click", function () {
     if (funcTokens.length != 0) {
         funcTokens = [];
+        varList = [];
         t_idx = 0;
         timeout = 0;
         displayNum = 0;
