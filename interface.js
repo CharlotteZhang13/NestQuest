@@ -30,6 +30,7 @@ function setDropdowns() {
             dropa.addEventListener("click", function () {
                 dropbtn = dropd.querySelector(".dropbtn");
                 dropbtn.textContent = dropa.textContent;
+                console.log(dropbtn.textContent);
             });
         });
     });
@@ -261,4 +262,3 @@ slistAll.forEach(slist => {
 })
 setTrashTriggers(trashDiv);
 setEditable();
-

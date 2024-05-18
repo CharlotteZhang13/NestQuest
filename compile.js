@@ -30,15 +30,13 @@ function readTokens(item) {
         func.name = "wait";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
-    } else if(item.classList.contains("bool")) {
-        func.name = "bool";
+    } else if (item.classList.contains("if")) {
+        func.name = "if";
         editable = item.querySelectorAll(".editable");
         sign = item.querySelector(".sign");
         func.val_01 = parseFloat(editable[0].textContent);
         func.val_02 = sign.textContent;
         func.val_03 = parseFloat(editable[1].textContent);
-    } else if(item.classList.contains("if")) {
-        func.name = "if";
     }
 
     return func;
@@ -50,7 +48,7 @@ function tokenize(target) {
     for (let item of items) {
         if (item.classList.contains("placeholder")) break;
         var func = readTokens(item);
-        if(func.name != null) funcTokens.push(func);
+        if (func.name != null) funcTokens.push(func);
         if (item.tagName == "UL") {
             tokenize(item);
         }
@@ -122,27 +120,49 @@ function func_while() {
 }
 
 function func_for(n) {
-    var t1, t2;
-    t1 = t_idx;
-    while (true) {
-        if (runTokens() == 0) {
-            t2 = t_idx - 1;
-            n--;
-            break;
+    if (n == 0) {
+        while(funcTokens[t_idx].name != "end"){
+            t_idx++;
+        };
+        t_idx++;
+    } else {
+        var t1, t2;
+        t1 = t_idx;
+        while (true) {
+            if (runTokens() == 0) {
+                t2 = t_idx - 1;
+                n--;
+                break;
+            }
         }
-    }
-    t_idx = t1;
+        t_idx = t1;
 
-    func_combiner(func_loop)(t1, t2, n);
-
-    t_idx = t2 + 1;
-}
-
-function func_if(){
-    if(runTokens()){
-
+        func_combiner(func_loop)(t1, t2, n);
+        t_idx = t2 + 1;
     }
 }
+
+function read_bool(n1, n2, s) {
+    if (s == "==") {
+        return n1 == n2;
+    } else if (s == ">") {
+        return n1 > n2;
+    } else if (s == "<") {
+        return n1 < n2;
+    } else {
+        return true;
+    }
+}
+
+function func_if(n1, n2, s) {
+    if (read_bool(n1, n2, s)) {
+        func_for(1);
+    } else {
+        func_for(0);
+    }
+}
+
+
 
 function runTokens() {
 
@@ -162,8 +182,8 @@ function runTokens() {
         }, timeout);
     } else if (token.name == "wait") {
         func_combiner(func_wait)(token.val_01);
-    } else if (token.name == "bool"){
-        return func_bool(token.val_01, token.val_02, token.val_03);
+    } else if (token.name == "if") {
+        func_combiner(func_if)(token.val_01, token.val_03, token.val_02);
     }
 
     return 1;
@@ -174,6 +194,11 @@ runButton.addEventListener("click", function () {
     while (t_idx < funcTokens.length) {
         runTokens();
     }
+
+    funcTokens = [];
+    t_idx = 0;
+    timeout = 0;
+    displayNum = 0;
 });
 
 stopButton.addEventListener("click", function () {
