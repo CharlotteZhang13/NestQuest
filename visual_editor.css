@@ -7,6 +7,92 @@
     justify-content: flex-start;
 }
 
+.rightalign {
+    justify-content: flex-start;
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    left: 1000px;
+    bottom: 34px;
+    right: 6px;
+    top: 34px;
+    position: absolute;
+    background: #f5f5f5;
+    border: 2px solid #726d6d;
+}
+
+/*
+blank_left {
+    margin-left: 0px;
+    background: #2f33f8;
+    animation: catAnimeLeft 1s linear 0s;
+    -webkit-animation: catAnimeLeft 1s linear 0s;
+}
+blank_left:hover {
+    animation-play-state: paused;
+}
+@keyframes catAnimeLeft {
+    0% {
+        padding-left: 0px;
+    }
+    100% {
+        padding-left: 10px;
+    }
+}*/
+/*
+blank_right {
+    background: #f5f5f5;
+    animation: catAnimeRight 0.5s linear 0s;
+    -webkit-animation: catAnimeRight 0.5s linear 0s;
+}
+blank_right:hover {
+    animation-play-state: running;
+}
+@keyframes catAnimeRight {
+    0% {
+        padding-right: 0px;
+    }
+    100% {
+        padding-right: 10px;
+    }
+}*/
+/*
+.blank_top {
+    margin-top: 0px;
+    width: 365px;
+    background: #2f33f8;
+    animation: catAnimeTop 1s linear 0s;
+    -webkit-animation: catAnimeTop 1s linear 0s;
+}
+.blank_top:hover {
+    animation-play-state: paused;
+}
+@keyframes catAnimeTop {
+    0% {
+        padding-bottom: 0px;
+    }
+    100% {
+        padding-bottom: 10px;
+    }
+}*/
+/*
+blank_bottom {
+    background: #f5f5f5;
+    animation: catAnimeBottom 0.5s linear 0s;
+    -webkit-animation: catAnimeBottom 0.5s linear 0s;
+}
+blank_bottom:hover {
+    animation-play-state: running;
+}
+@keyframes catAnimeBottom {
+    0% {
+        padding-bottom: 0px;
+    }
+    100% {
+        padding-bottom: 10px;
+    }
+}*/
+
 .slist {
     list-style: none;
     background: #f5f5f5;
