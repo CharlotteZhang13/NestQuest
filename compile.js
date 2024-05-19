@@ -8,6 +8,12 @@ var stopButton = document.getElementById("stop");
 var displayDiv = document.getElementById("display");
 var forcestop = false;
 
+var mVertical = 0;
+var mHorizontal = 0;
+var verticalDiv = document.getElementById("verticalmoves")
+var horizontalDiv = document.getElementById("horizontalmoves")
+
+
 function readVar() {
     varAll = document.querySelectorAll(".var_horizontal");
     idx = 0;
@@ -71,6 +77,16 @@ function readTokens(item) {
                 func.val_03 = varList[parseInt(second.querySelector(".name").textContent)];
             }
         }
+    }
+    else if (item.classList.contains("MoveVertical")) {
+        func.name = "MoveVertical";
+        editable = item.querySelector(".editable");
+        func.val_01 = parseFloat(editable.textContent);
+    }
+    else if (item.classList.contains("MoveHorizontal")) {
+        func.name = "MoveHorizontal";
+        editable = item.querySelector(".editable");
+        func.val_01 = parseFloat(editable.textContent);
     }
 
     return func;
@@ -202,6 +218,32 @@ function func_if(n1, n2, s) {
     }
 }
 
+function func_vertical_move(n) {
+    mVertical += n;
+    text = "";
+    temp = mVertical;
+    while (temp > 0) {
+        text += "\n";
+        temp--;
+    }
+    verticalDiv.innerText = text;
+}
+//func_vertical_move(5)
+
+function func_horizontal_move(n) {
+    mHorizontal += n;
+    text = "";
+    temp = mHorizontal;
+    while (temp > 0) {
+        text += "aa";
+        temp -= 1;
+    }
+    horizontalDiv.innerText = text;
+    horizontalDiv.style.color = "#f5f5f5";
+}
+//func_horizontal_move(5)
+
+
 function runTokens() {
 
     var token = funcTokens[t_idx];
@@ -223,6 +265,14 @@ function runTokens() {
         func_combiner(func_wait)(token.val_01);
     } else if (token.name == "if") {
         func_combiner(func_if)(token.val_01, token.val_03, token.val_02);
+    } else if (token.name == "MoveVertical") {
+        setTimeout(() => {
+            func_combiner(func_vertical_move)(token.val_01);
+        }, timeout);
+    } else if (token.name == "MoveHorizontal") {
+        setTimeout(() => {
+            func_combiner(func_horizontal_move)(token.val_01);
+        }, timeout);
     }
 
     return 1;
@@ -249,6 +299,11 @@ stopButton.addEventListener("click", function () {
         t_idx = 0;
         timeout = 0;
         displayNum = 0;
+        displayDiv.innerText = displayNum;
+        mVertical = 0;
+        verticalDiv.innerText = "";
+        mHorizontal = 0;
+        horizontalDiv.innerText = "";
         forcestop = true;
     }
 

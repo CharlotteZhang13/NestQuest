@@ -39,7 +39,7 @@ function setDropdowns() {
 function setSlistPlaceholders(target) {
     if (target.id == "menu" || target.id == "trash" || target.id == "var_menu") return;
     var placeHolder = document.createElement("li");
-    placeHolder.textContent = "Add code blocs to above...";
+    placeHolder.textContent = "Add code blocks to above...";
     placeHolder.classList.add("element");
     placeHolder.classList.add("placeholder");
     target.appendChild(placeHolder);
