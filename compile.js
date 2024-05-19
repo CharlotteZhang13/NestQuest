@@ -284,6 +284,11 @@ runButton.addEventListener("click", function () {
     t_idx = 0;
     timeout = 0;
     displayNum = 0;
+    mVertical = 0;
+    verticalDiv.innerText = "";
+    mHorizontal = 0;
+    horizontalDiv.innerText = "";
+    forcestop = false;
 
     readVar();
     tokenize(mainSlist);
