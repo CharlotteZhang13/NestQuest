@@ -112,7 +112,7 @@ function tokenize(target) {
 }
 
 function func_combiner(fn) {
-    return function () {
+    return async function () {
         if (forcestop == true) {
             forcestop = false;
             var highestTimeoutId = setTimeout(";");
@@ -121,17 +121,19 @@ function func_combiner(fn) {
             }
             return;
         }
-        fn.apply(this, arguments);
+        await fn.apply(this, arguments);
     }
 }
 
-function func_add(incre) {
+async function func_add(incre) {
     displayNum += incre;
     displayDiv.innerText = displayNum;
 }
 
-function func_wait(time) {
-    timeout += time;
+async function func_wait(time) {
+    return new Promise(resolve => {
+        setTimeout(resolve, time);
+    })
 }
 
 function func_loop(t1, t2, rmn) {
@@ -152,9 +154,16 @@ function func_loop(t1, t2, rmn) {
     }
 }
 
-function func_while() {
+async function func_while() {
     var t1, t2;
     t1 = t_idx;
+
+    while (funcTokens[t_idx].name != "end") {
+        t_idx++;
+    };
+    t2 = t_idx;
+    t_idx = t1;
+
     while (true) {
         if (runTokens() == 0) {
             t2 = t_idx - 1;
@@ -244,7 +253,7 @@ function func_horizontal_move(n) {
 //func_horizontal_move(5)
 
 
-function runTokens() {
+async function runTokens() {
 
     var token = funcTokens[t_idx];
     t_idx++;
@@ -258,27 +267,21 @@ function runTokens() {
     } else if (token.name == "end") {
         return 0;
     } else if (token.name == "add") {
-        setTimeout(() => {
-            func_combiner(func_add)(token.val_01);
-        }, timeout);
+        await func_combiner(func_add)(token.val_01);
     } else if (token.name == "wait") {
-        func_combiner(func_wait)(token.val_01);
+        await func_combiner(func_wait)(token.val_01);
     } else if (token.name == "if") {
         func_combiner(func_if)(token.val_01, token.val_03, token.val_02);
     } else if (token.name == "MoveVertical") {
-        setTimeout(() => {
-            func_combiner(func_vertical_move)(token.val_01);
-        }, timeout);
+        func_combiner(func_vertical_move)(token.val_01);
     } else if (token.name == "MoveHorizontal") {
-        setTimeout(() => {
-            func_combiner(func_horizontal_move)(token.val_01);
-        }, timeout);
+        func_combiner(func_horizontal_move)(token.val_01);
     }
 
     return 1;
 }
 
-runButton.addEventListener("click", function () {
+runButton.addEventListener("click", async function () {
     funcTokens = [];
     varList = [];
     t_idx = 0;
@@ -293,7 +296,7 @@ runButton.addEventListener("click", function () {
     readVar();
     tokenize(mainSlist);
     while (t_idx < funcTokens.length) {
-        runTokens();
+        await runTokens();
     }
 });
 
