@@ -59,6 +59,19 @@ function readTokens(item) {
         func.name = "add";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
+    } else if (item.classList.contains("plus_add")) {
+        func.name = "plus_add";
+        first = item.querySelector(".horizontal").children[0];
+        var x = first.querySelector(".name").textContent;
+        func.val_01 = varList[x - '0'];
+        sign = item.querySelector(".sign");
+        func.val_02 = sign.textContent;
+        second = item.querySelector(".dropdown").nextElementSibling;
+        if (second.classList.contains("editable")) {
+            func.val_03 = parseFloat(second.textContent);
+        } else {
+            func.val_03 = varList[parseInt(second.querySelector(".name").textContent)];
+        }
     } else if (item.classList.contains("wait")) {
         func.name = "wait";
         editable = item.querySelector(".editable");
@@ -140,29 +153,31 @@ async function func_add(incre) {
     displayDiv.innerText = displayNum;
 }
 
+async function func_plus_add(n1, n2, sign) {
+    if (typeof n2 == "object") {
+        n2 = varList[n2.idx].val;
+    }
+    switch (sign) {
+        case "+=":
+            varList[n1.idx].val += n2;
+            break;
+        case "-=":
+            varList[n1.idx].val -= n2;
+            break;
+        case "*=":
+            varList[n1.idx].val *= n2;
+            break;
+        case "/=":
+            varList[n1.idx].val /= n2;
+            break;
+    }
+}
+
 async function func_wait(time) {
     return new Promise(resolve => {
         setTimeout(resolve, time);
     })
 }
-
-// function func_loop(t1, t2, rmn) {
-
-//     if (rmn == 0) {
-//         return;
-//     }
-
-//     while (t_idx < t2) {
-//         runTokens();
-//     }
-
-//     t_idx = t1
-//     if (rmn == -1) {
-//         func_combiner(func_loop)(t1, t2, -1);
-//     } else {
-//         func_combiner(func_loop)(t1, t2, rmn - 1);
-//     }
-// }
 
 async function func_while(id) {
     var t1, t2;
@@ -179,7 +194,7 @@ async function func_while(id) {
         t_idx = t1
         while (t_idx < t2) {
             var a = await runTokens();
-            if (a== returnVal.BREAK) {
+            if (a == returnVal.BREAK) {
                 bk = true;
                 break;
             }
@@ -254,7 +269,7 @@ async function func_if(n1, n2, s, id) {
     return returnVal.REGULAR;
 }
 
-function func_vertical_move(n) {
+async function func_vertical_move(n) {
     mVertical += n;
     text = "";
     temp = mVertical;
@@ -266,7 +281,7 @@ function func_vertical_move(n) {
 }
 //func_vertical_move(5)
 
-function func_horizontal_move(n) {
+async function func_horizontal_move(n) {
     mHorizontal += n;
     text = "";
     temp = mHorizontal;
@@ -297,14 +312,16 @@ async function runTokens() {
         return returnVal.END;
     } else if (token.name == "add") {
         await func_combiner(func_add)(token.val_01);
+    } else if (token.name == "plus_add") {
+        await func_combiner(func_plus_add)(token.val_01, token.val_03, token.val_02);
     } else if (token.name == "wait") {
         await func_combiner(func_wait)(token.val_01);
     } else if (token.name == "if") {
         return await func_combiner(func_if)(token.val_01, token.val_03, token.val_02, token.idx);
     } else if (token.name == "MoveVertical") {
-        func_combiner(func_vertical_move)(token.val_01);
+        await func_combiner(func_vertical_move)(token.val_01);
     } else if (token.name == "MoveHorizontal") {
-        func_combiner(func_horizontal_move)(token.val_01);
+        await func_combiner(func_horizontal_move)(token.val_01);
     }
 
     return returnVal.REGULAR;
