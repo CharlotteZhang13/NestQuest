@@ -47,9 +47,7 @@ function readTokens(item) {
         idx: 0
     };
 
-    if (item.classList.contains("while")) {
-        func.name = "while";
-    } else if (item.classList.contains("for")) {
+    if (item.classList.contains("for")) {
         func.name = "for";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
@@ -76,8 +74,8 @@ function readTokens(item) {
         func.name = "wait";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
-    } else if (item.classList.contains("if")) {
-        func.name = "if";
+    } else if (item.classList.contains("if") || item.classList.contains("while")) {
+        func.name = item.classList.contains("if")? "if" : "while";
         sign = item.querySelector(".sign");
         if (sign == null) {
             func.val_01 = 1;
@@ -179,7 +177,7 @@ async function func_wait(time) {
     })
 }
 
-async function func_while(id) {
+async function func_while(n1, n2, s, id) {
     var t1, t2;
     var bk = false;
     t1 = t_idx;
@@ -189,7 +187,7 @@ async function func_while(id) {
     };
     t2 = t_idx;
 
-    while (true) {
+    while (read_bool(n1, n2, s)) {
         if (bk) break;
         t_idx = t1
         while (t_idx < t2) {
@@ -229,6 +227,13 @@ async function func_for(n, id) {
 }
 
 function read_bool(n1, n2, s) {
+    if (typeof n1 == "object") {
+        n1 = varList[n1.idx].val;
+    }
+    if (typeof n2 == "object") {
+        n2 = varList[n2.idx].val;
+    }
+
     if (s == "==") {
         return n1 == n2;
     } else if (s == ">") {
@@ -241,12 +246,6 @@ function read_bool(n1, n2, s) {
 }
 
 async function func_if(n1, n2, s, id) {
-    if (typeof n1 == "object") {
-        n1 = varList[n1.idx].val;
-    }
-    if (typeof n2 == "object") {
-        n2 = varList[n2.idx].val;
-    }
 
     var t1, t2;
     t1 = t_idx;
@@ -303,7 +302,7 @@ async function runTokens() {
     displayDiv.innerText = displayNum;
 
     if (token.name == "while") {
-        await func_combiner(func_while)(token.idx);
+        await func_combiner(func_while)(token.val_01, token.val_03, token.val_02, token.idx);
     } else if (token.name == "for") {
         await func_combiner(func_for)(token.val_01, token.idx);
     } else if (token.name == "break") {
