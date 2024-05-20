@@ -10,9 +10,15 @@ var forcestop = false;
 
 var mVertical = 0;
 var mHorizontal = 0;
+var tokenIdx = 0;
 var verticalDiv = document.getElementById("verticalmoves")
 var horizontalDiv = document.getElementById("horizontalmoves")
 
+returnVal = {
+    END: 0,
+    REGULAR: 1,
+    BREAK: 2
+}
 
 function readVar() {
     varAll = document.querySelectorAll(".var_horizontal");
@@ -37,7 +43,8 @@ function readTokens(item) {
         name: null,
         val_01: 0,
         val_02: 0,
-        val_03: 0
+        val_03: 0,
+        idx: 0
     };
 
     if (item.classList.contains("while")) {
@@ -46,6 +53,8 @@ function readTokens(item) {
         func.name = "for";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
+    } else if (item.classList.contains("break")) {
+        func.name = "break";
     } else if (item.classList.contains("add")) {
         func.name = "add";
         editable = item.querySelector(".editable");
@@ -95,20 +104,21 @@ function readTokens(item) {
 function tokenize(target) {
 
     let items = target.children;
+    let currentIdx = tokenIdx;
     for (let item of items) {
         if (item.classList.contains("placeholder")) break;
         var func = readTokens(item);
+        if (item.tagName == "UL") func.idx = ++tokenIdx;
         if (func.name != null) funcTokens.push(func);
-        if (item.tagName == "UL") {
-            tokenize(item);
-        }
+        if (item.tagName == "UL") tokenize(item);
     }
-    var func = {
+    var f = {
         name: "end",
         val_01: 0,
-        val_02: 0
+        val_02: 0,
+        idx: currentIdx
     };
-    funcTokens.push(func);
+    funcTokens.push(f);
 }
 
 function func_combiner(fn) {
@@ -121,7 +131,7 @@ function func_combiner(fn) {
             }
             return;
         }
-        await fn.apply(this, arguments);
+        return await fn.apply(this, arguments);
     }
 }
 
@@ -136,68 +146,71 @@ async function func_wait(time) {
     })
 }
 
-function func_loop(t1, t2, rmn) {
+// function func_loop(t1, t2, rmn) {
 
-    if (rmn == 0) {
-        return;
-    }
+//     if (rmn == 0) {
+//         return;
+//     }
 
-    while (t_idx < t2) {
-        runTokens();
-    }
+//     while (t_idx < t2) {
+//         runTokens();
+//     }
 
-    t_idx = t1
-    if (rmn == -1) {
-        func_combiner(func_loop)(t1, t2, -1);
-    } else {
-        func_combiner(func_loop)(t1, t2, rmn - 1);
-    }
-}
+//     t_idx = t1
+//     if (rmn == -1) {
+//         func_combiner(func_loop)(t1, t2, -1);
+//     } else {
+//         func_combiner(func_loop)(t1, t2, rmn - 1);
+//     }
+// }
 
-async function func_while() {
+async function func_while(id) {
     var t1, t2;
+    var bk = false;
     t1 = t_idx;
 
-    while (funcTokens[t_idx].name != "end") {
+    while (funcTokens[t_idx].name != "end" || funcTokens[t_idx].idx != id) {
         t_idx++;
     };
     t2 = t_idx;
-    t_idx = t1;
 
     while (true) {
-        if (runTokens() == 0) {
-            t2 = t_idx - 1;
-            break;
+        if (bk) break;
+        t_idx = t1
+        while (t_idx < t2) {
+            var a = await runTokens();
+            if (a== returnVal.BREAK) {
+                bk = true;
+                break;
+            }
         }
     }
-    t_idx = t1;
-
-    func_combiner(func_loop)(t1, t2, -1);
 
     t_idx = t2 + 1;
 }
 
-function func_for(n) {
-    if (n == 0) {
-        while (funcTokens[t_idx].name != "end") {
-            t_idx++;
-        };
+async function func_for(n, id) {
+    var t1, t2;
+    var bk = false;
+    t1 = t_idx;
+
+    while (funcTokens[t_idx].name != "end" && funcTokens[t_idx].idx != id) {
         t_idx++;
-    } else {
-        var t1, t2;
-        t1 = t_idx;
-        while (true) {
-            if (runTokens() == 0) {
-                t2 = t_idx - 1;
-                n--;
+    };
+    t2 = t_idx;
+
+    for (var i = 0; i < n; i++) {
+        if (bk) break;
+        t_idx = t1
+        while (t_idx < t2) {
+            if (await runTokens() == returnVal.BREAK) {
+                bk = true;
                 break;
             }
         }
-        t_idx = t1;
-
-        func_combiner(func_loop)(t1, t2, n);
-        t_idx = t2 + 1;
     }
+
+    t_idx = t2 + 1;
 }
 
 function read_bool(n1, n2, s) {
@@ -212,7 +225,7 @@ function read_bool(n1, n2, s) {
     }
 }
 
-function func_if(n1, n2, s) {
+async function func_if(n1, n2, s, id) {
     if (typeof n1 == "object") {
         n1 = varList[n1.idx].val;
     }
@@ -220,11 +233,25 @@ function func_if(n1, n2, s) {
         n2 = varList[n2.idx].val;
     }
 
+    var t1, t2;
+    t1 = t_idx;
+    while (funcTokens[t_idx].name != "end" && funcTokens[t_idx].idx != id) {
+        t_idx++;
+    };
+    t2 = t_idx;
+
     if (read_bool(n1, n2, s)) {
-        func_for(1);
-    } else {
-        func_for(0);
+        t_idx = t1
+        while (t_idx < t2) {
+            if (await runTokens() == returnVal.BREAK) {
+                t_idx = t2 + 1;
+                return returnVal.BREAK;
+            }
+        }
     }
+
+    t_idx = t2 + 1;
+    return returnVal.REGULAR;
 }
 
 function func_vertical_move(n) {
@@ -257,28 +284,30 @@ async function runTokens() {
 
     var token = funcTokens[t_idx];
     t_idx++;
-    timeout += 4;
+    await func_combiner(func_wait)(4);
     displayDiv.innerText = displayNum;
 
     if (token.name == "while") {
-        func_combiner(func_while)();
+        await func_combiner(func_while)(token.idx);
     } else if (token.name == "for") {
-        func_combiner(func_for)(token.val_01);
+        await func_combiner(func_for)(token.val_01, token.idx);
+    } else if (token.name == "break") {
+        return returnVal.BREAK;
     } else if (token.name == "end") {
-        return 0;
+        return returnVal.END;
     } else if (token.name == "add") {
         await func_combiner(func_add)(token.val_01);
     } else if (token.name == "wait") {
         await func_combiner(func_wait)(token.val_01);
     } else if (token.name == "if") {
-        func_combiner(func_if)(token.val_01, token.val_03, token.val_02);
+        return await func_combiner(func_if)(token.val_01, token.val_03, token.val_02, token.idx);
     } else if (token.name == "MoveVertical") {
         func_combiner(func_vertical_move)(token.val_01);
     } else if (token.name == "MoveHorizontal") {
         func_combiner(func_horizontal_move)(token.val_01);
     }
 
-    return 1;
+    return returnVal.REGULAR;
 }
 
 runButton.addEventListener("click", async function () {
