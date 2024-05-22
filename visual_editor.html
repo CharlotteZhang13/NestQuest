@@ -5,162 +5,174 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visual Editor</title>
-    <link rel="stylesheet" href="visual_editor.css">
-    <script src="interface.js" defer></script>
-    <script src="compile.js" defer></script>
+    <link rel="stylesheet" href="./visual_editor.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./client.js" defer></script>
+    <script src="./interface.js" defer></script>
+    <script src="./compile.js" defer></script>
 </head>
 
 <body>
-    <button id="run">
-        <svg t="1714443319787" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-            p-id="1542" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="23">
-            <path
-                d="M774.9 214c-39.8 15.4-98.9 20.3-180.9-15.5-176.7-77-247 0-247 0v-42.2c0-22-17.8-39.8-39.8-39.8s-39.8 17.8-39.8 39.8v685.4c0 22 17.8 39.8 39.8 39.8s39.8-17.8 39.8-39.8V567.4s70.3-77 247 0c132.8 57.9 205.5 9.4 233.5-18.2 8.9-8.8 13.6-20.9 13.6-33.4v-258c-0.1-34-34.5-56.1-66.2-43.8z"
-                fill="#1afa29" p-id="1543"></path>
-        </svg>
-    </button>
-    <button id="stop">
-        <svg t="1714443390215" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-            p-id="2562" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="23">
-            <path
-                d="M504.109851 16.453128c-278.332339 0-503.966321 225.632974-503.966321 503.966321S225.776505 1024.384762 504.109851 1024.384762s503.966321-225.632974 503.966321-503.966321S782.44219 16.453128 504.109851 16.453128zM242.706054 566.655409l0.04734-94.679771 525.432441 0-0.017123 94.679771L242.706054 566.655409z"
-                fill="#d81e06" p-id="2563"></path>
-        </svg>
-    </button>
-    <div class="horizontal">
-        <div>
-            <ul class="slist element" id="menu">
-                Code blocs
-                <li class="element break">
-                    break
-                </li>
-                <li class="element add">
-                    <div class="horizontal ignore">
-                        <p class="ignore">Add :</p>
-                        <p class="editable" contenteditable="true">100</p>
-                    </div>
-                </li>
-                <li class="element plus_add">
-                    <div class="horizontal ignore">
-                        <p class="editable">var #0</p>
+    <div id="init">
+        <img src="cat_img.png" width=150px>
+        <button onclick="createEditor()">Create Editor</button> 
+        <div>or</div>
+        <input placeholder="Enter Code" type="text" id="roomUniqueId" />
+        <button onclick="joinEditor()">Join Editor</button>
+    </div>
+    <div id="editor">
+        <button id="run">
+            <svg t="1714443319787" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                p-id="1542" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="23">
+                <path
+                    d="M774.9 214c-39.8 15.4-98.9 20.3-180.9-15.5-176.7-77-247 0-247 0v-42.2c0-22-17.8-39.8-39.8-39.8s-39.8 17.8-39.8 39.8v685.4c0 22 17.8 39.8 39.8 39.8s39.8-17.8 39.8-39.8V567.4s70.3-77 247 0c132.8 57.9 205.5 9.4 233.5-18.2 8.9-8.8 13.6-20.9 13.6-33.4v-258c-0.1-34-34.5-56.1-66.2-43.8z"
+                    fill="#1afa29" p-id="1543"></path>
+            </svg>
+        </button>
+        <button id="stop">
+            <svg t="1714443390215" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                p-id="2562" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="23">
+                <path
+                    d="M504.109851 16.453128c-278.332339 0-503.966321 225.632974-503.966321 503.966321S225.776505 1024.384762 504.109851 1024.384762s503.966321-225.632974 503.966321-503.966321S782.44219 16.453128 504.109851 16.453128zM242.706054 566.655409l0.04734-94.679771 525.432441 0-0.017123 94.679771L242.706054 566.655409z"
+                    fill="#d81e06" p-id="2563"></path>
+            </svg>
+        </button>
+        <div class="horizontal">
+            <div>
+                <ul class="slist element" id="menu">
+                    Code blocs
+                    <li class="element break">
+                        break
+                    </li>
+                    <li class="element add">
+                        <div class="horizontal ignore">
+                            <p class="ignore">Add :</p>
+                            <p class="editable" contenteditable="true">100</p>
+                        </div>
+                    </li>
+                    <li class="element plus_add">
+                        <div class="horizontal ignore">
+                            <p class="editable">var #0</p>
+                            <div class="dropdown">
+                                <button class="dropbtn sign">+=</button>
+                                <div class="dropdown-content">
+                                    <a class="item">+=</a>
+                                    <a class="item">-=</a>
+                                    <a class="item">*=</a>
+                                    <a class="item">/=</a>
+                                </div>
+                            </div>
+                            <p class="editable" contenteditable="true">1</p>
+                        </div>
+                    </li>
+                    <li class="element wait">
+                        <div class="horizontal ignore">
+                            <p class="ignore">wait :</p>
+                            <p class="editable" contenteditable="true">500</p>
+                        </div>
+                    </li>
+                    <li class="element MoveVertical">
+                        <div class="horizontal ignore">
+                            <p class="ignore">MoveVertical :</p>
+                            <p class="editable" contenteditable="true">5</p>
+                        </div>
+                    </li>
+                    <li class="element MoveHorizontal">
+                        <div class="horizontal ignore">
+                            <p class="ignore">MoveHorizontal :</p>
+                            <p class="editable" contenteditable="true">5</p>
+                        </div>
+                    </li>
+                    <ul class="slist element while">
+                        <div class="horizontal ignore">
+                            <p class="ignore">while :</p>
+                            <p class="editable">true</p>
+                        </div>
+                    </ul>
+                    <ul class="slist element if">
+                        <div class="horizontal ignore">
+                            <p class="ignore">if :</p>
+                            <p class="editable">true</p>
+                        </div>
+                    </ul>
+                    <ul class="slist element for">
+                        <div class="horizontal ignore">
+                            <p class="ignore">for range :</p>
+                            <p class="editable" contenteditable="true">10</p>
+                        </div>
+                    </ul>
+                    <li class="element bool horizontal">
+                        <p class="editable" contenteditable="true">500</p>
                         <div class="dropdown">
-                            <button class="dropbtn sign">+=</button>
+                            <button class="dropbtn sign">==</button>
                             <div class="dropdown-content">
-                                <a class="item">+=</a>
-                                <a class="item">-=</a>
-                                <a class="item">*=</a>
-                                <a class="item">/=</a>
+                                <a class="item">==</a>
+                                <a class="item">&lt;</a>
+                                <a class="item">&gt;</a>
                             </div>
                         </div>
-                        <p class="editable" contenteditable="true">1</p>
-                    </div>
-                </li>
-                <li class="element wait">
-                    <div class="horizontal ignore">
-                        <p class="ignore">wait :</p>
                         <p class="editable" contenteditable="true">500</p>
-                    </div>
-                </li>
-                <li class="element MoveVertical">
-                    <div class="horizontal ignore">
-                        <p class="ignore">MoveVertical :</p>
-                        <p class="editable" contenteditable="true">5</p>
-                    </div>
-                </li>
-                <li class="element MoveHorizontal">
-                    <div class="horizontal ignore">
-                        <p class="ignore">MoveHorizontal :</p>
-                        <p class="editable" contenteditable="true">5</p>
-                    </div>
-                </li>
-                <ul class="slist element while">
-                    <div class="horizontal ignore">
-                        <p class="ignore">while :</p>
-                        <p class="editable">true</p>
-                    </div>
+                    </li>
                 </ul>
-                <ul class="slist element if">
-                    <div class="horizontal ignore">
-                        <p class="ignore">if :</p>
-                        <p class="editable">true</p>
-                    </div>
-                </ul>
-                <ul class="slist element for">
-                    <div class="horizontal ignore">
-                        <p class="ignore">for range :</p>
-                        <p class="editable" contenteditable="true">10</p>
-                    </div>
-                </ul>
-                <li class="element bool horizontal">
-                    <p class="editable" contenteditable="true">500</p>
+                <div id="trash">
+                    <svg t="1714445658494" class="ignore" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="4472" xmlns:xlink="http://www.w3.org/1999/xlink" width="25"
+                        height="25">
+                        <path
+                            d="M380.565633 84.168898C391.492953 73.241577 412.883938 64.383234 428.328892 64.383234L596.182087 64.383234C611.633685 64.383234 633.010015 73.233567 643.945345 84.168898L680.111776 120.335329 344.399202 120.335329 380.565633 84.168898Z"
+                            fill="#FC5143" p-id="4473"></path>
+                        <path
+                            d="M875.944112 176.287425C891.394856 176.287425 903.92016 163.762122 903.92016 148.311377 903.92016 132.860633 891.394856 120.335329 875.944112 120.335329L148.566866 120.335329C133.116122 120.335329 120.590818 132.860633 120.590818 148.311377 120.590818 163.762122 133.116122 176.287425 148.566866 176.287425L875.944112 176.287425Z"
+                            fill="#FC5143" p-id="4474"></path>
+                        <path
+                            d="M180.539492 232.239521 180.254748 228.253099 228.640985 176.287425 232.637564 176.287425 280.347765 844.230242C282.63628 876.269454 312.053012 903.664671 344.377659 903.664671L680.133319 903.664671C712.845805 903.664671 741.848496 876.636282 744.163214 844.230242L791.873414 176.287425 795.869993 176.287425 844.25623 228.253099 843.971486 232.239521 180.539492 232.239521ZM847.968064 176.287425 799.973118 848.216664C795.578506 909.741242 742.362215 959.616766 680.133319 959.616766L344.377659 959.616766C282.586578 959.616766 228.909839 909.424372 224.53786 848.216664L176.542914 176.287425 847.968064 176.287425Z"
+                            fill="#FC5143" p-id="4475"></path>
+                        <path
+                            d="M484.279441 763.784431C484.279441 779.235176 496.804744 791.760479 512.255489 791.760479 527.706234 791.760479 540.231537 779.235176 540.231537 763.784431L540.231537 372.11976C540.231537 356.669016 527.706234 344.143713 512.255489 344.143713 496.804744 344.143713 484.279441 356.669016 484.279441 372.11976L484.279441 763.784431Z"
+                            fill="#FC5143" p-id="4476"></path>
+                        <path
+                            d="M607.198225 760.600957C605.851604 775.992907 617.237593 789.562199 632.629543 790.908821 648.021493 792.255442 661.590785 780.869453 662.937406 765.477503L697.073232 375.303235C698.419853 359.911285 687.033864 346.341992 671.641914 344.995371 656.249965 343.64875 642.680672 355.034739 641.334051 370.426688L607.198225 760.600957Z"
+                            fill="#FC5143" p-id="4477"></path>
+                        <path
+                            d="M361.573572 765.477503C362.920193 780.869453 376.489486 792.255442 391.881435 790.908821 407.273385 789.562199 418.659374 775.992907 417.312753 760.600957L383.176927 370.426688C381.830306 355.034739 368.261013 343.64875 352.869064 344.995371 337.477114 346.341992 326.091125 359.911285 327.437746 375.303235L361.573572 765.477503Z"
+                            fill="#FC5143" p-id="4478"></path>
+                    </svg>
+                </div>
+            </div>
+            <ul class="slist element" id="var_menu">
+                <p>Variables</p>
+                <div class="var_horizontal">
+                    <li class="var element bool">
+                        <p class="name">0</p>
+                    </li>
                     <div class="dropdown">
-                        <button class="dropbtn sign">==</button>
+                        <button class="dropbtn sign">number</button>
                         <div class="dropdown-content">
-                            <a class="item">==</a>
-                            <a class="item">&lt;</a>
-                            <a class="item">&gt;</a>
+                            <a class="item">number</a>
+                            <a class="item">bool</a>
+                            <a class="item">string</a>
                         </div>
                     </div>
-                    <p class="editable" contenteditable="true">500</p>
-                </li>
-            </ul>
-            <div id="trash">
-                <svg t="1714445658494" class="ignore" viewBox="0 0 1024 1024" version="1.1"
-                    xmlns="http://www.w3.org/2000/svg" p-id="4472" xmlns:xlink="http://www.w3.org/1999/xlink" width="25"
-                    height="25">
-                    <path
-                        d="M380.565633 84.168898C391.492953 73.241577 412.883938 64.383234 428.328892 64.383234L596.182087 64.383234C611.633685 64.383234 633.010015 73.233567 643.945345 84.168898L680.111776 120.335329 344.399202 120.335329 380.565633 84.168898Z"
-                        fill="#FC5143" p-id="4473"></path>
-                    <path
-                        d="M875.944112 176.287425C891.394856 176.287425 903.92016 163.762122 903.92016 148.311377 903.92016 132.860633 891.394856 120.335329 875.944112 120.335329L148.566866 120.335329C133.116122 120.335329 120.590818 132.860633 120.590818 148.311377 120.590818 163.762122 133.116122 176.287425 148.566866 176.287425L875.944112 176.287425Z"
-                        fill="#FC5143" p-id="4474"></path>
-                    <path
-                        d="M180.539492 232.239521 180.254748 228.253099 228.640985 176.287425 232.637564 176.287425 280.347765 844.230242C282.63628 876.269454 312.053012 903.664671 344.377659 903.664671L680.133319 903.664671C712.845805 903.664671 741.848496 876.636282 744.163214 844.230242L791.873414 176.287425 795.869993 176.287425 844.25623 228.253099 843.971486 232.239521 180.539492 232.239521ZM847.968064 176.287425 799.973118 848.216664C795.578506 909.741242 742.362215 959.616766 680.133319 959.616766L344.377659 959.616766C282.586578 959.616766 228.909839 909.424372 224.53786 848.216664L176.542914 176.287425 847.968064 176.287425Z"
-                        fill="#FC5143" p-id="4475"></path>
-                    <path
-                        d="M484.279441 763.784431C484.279441 779.235176 496.804744 791.760479 512.255489 791.760479 527.706234 791.760479 540.231537 779.235176 540.231537 763.784431L540.231537 372.11976C540.231537 356.669016 527.706234 344.143713 512.255489 344.143713 496.804744 344.143713 484.279441 356.669016 484.279441 372.11976L484.279441 763.784431Z"
-                        fill="#FC5143" p-id="4476"></path>
-                    <path
-                        d="M607.198225 760.600957C605.851604 775.992907 617.237593 789.562199 632.629543 790.908821 648.021493 792.255442 661.590785 780.869453 662.937406 765.477503L697.073232 375.303235C698.419853 359.911285 687.033864 346.341992 671.641914 344.995371 656.249965 343.64875 642.680672 355.034739 641.334051 370.426688L607.198225 760.600957Z"
-                        fill="#FC5143" p-id="4477"></path>
-                    <path
-                        d="M361.573572 765.477503C362.920193 780.869453 376.489486 792.255442 391.881435 790.908821 407.273385 789.562199 418.659374 775.992907 417.312753 760.600957L383.176927 370.426688C381.830306 355.034739 368.261013 343.64875 352.869064 344.995371 337.477114 346.341992 326.091125 359.911285 327.437746 375.303235L361.573572 765.477503Z"
-                        fill="#FC5143" p-id="4478"></path>
-                </svg>
-            </div>
-        </div>
-        <ul class="slist element" id="var_menu">
-            <p>Variables</p>
-            <div class="var_horizontal">
-                <li class="var element bool">
-                    <p class="name">0</p>
-                </li>
-                <div class="dropdown">
-                    <button class="dropbtn sign">number</button>
-                    <div class="dropdown-content">
-                        <a class="item">number</a>
-                        <a class="item">bool</a>
-                        <a class="item">string</a>
-                    </div>
+                    <p class="editable" contenteditable="true">100</p>
                 </div>
-                <p class="editable" contenteditable="true">100</p>
+                <button id="add_var">Add variable</button>
+            </ul>
+            <ul class="slist element" id="main">
+                main
+            </ul>
+            <div id="display">0</div>
+        </div>
+        <div class="rightalign">
+            <p id="verticalmoves"></p>
+            <div>
+                <span>
+                    <span id="horizontalmoves"></span>
+                    <img src="cat_img.png" alt="cat" width=150px>
+                </span>
             </div>
-            <button id="add_var">Add variable</button>
-        </ul>
-        <ul class="slist element" id="main">
-            main
-        </ul>
-        <div id="display">0</div>
-    </div>
-    <div class="rightalign">
-        <p id="verticalmoves"></p>
-        <div>
-            <span>
-                <span id="horizontalmoves"></span>
-                <img src="cat_img.png" alt="cat" width=150px>
-            </span>
         </div>
     </div>
+
 </body>
 
 </html>
