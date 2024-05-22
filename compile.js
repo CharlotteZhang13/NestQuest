@@ -13,6 +13,7 @@ var mHorizontal = 0;
 var tokenIdx = 0;
 var verticalDiv = document.getElementById("verticalmoves")
 var horizontalDiv = document.getElementById("horizontalmoves")
+var sayDiv = document.getElementById("talks")
 
 returnVal = {
     END: 0,
@@ -44,6 +45,7 @@ function readTokens(item) {
         val_01: 0,
         val_02: 0,
         val_03: 0,
+        val_04: '',
         idx: 0
     };
 
@@ -107,6 +109,11 @@ function readTokens(item) {
         func.name = "MoveHorizontal";
         editable = item.querySelector(".editable");
         func.val_01 = parseFloat(editable.textContent);
+    }
+    else if (item.classList.contains("Say")) {
+        func.name = "Say";
+        editable = item.querySelector(".editable");
+        func.val_04 = editable.textContent;
     }
 
     return func;
@@ -293,12 +300,16 @@ async function func_horizontal_move(n) {
 }
 //func_horizontal_move(5)
 
+async function func_say(str) {
+    //await func_combiner(func_wait)(50);
+    sayDiv.innerText = str;
+}
+//func_say("hihihihihihihihi");
 
 async function runTokens() {
 
     var token = funcTokens[t_idx];
     t_idx++;
-    await func_combiner(func_wait)(4);
     displayDiv.innerText = displayNum;
 
     if (token.name == "while") {
@@ -321,7 +332,10 @@ async function runTokens() {
         await func_combiner(func_vertical_move)(token.val_01);
     } else if (token.name == "MoveHorizontal") {
         await func_combiner(func_horizontal_move)(token.val_01);
+    } else if (token.name == "Say") {
+        await func_combiner(func_say)(token.val_04);
     }
+    await func_combiner(func_wait)(300);
 
     return returnVal.REGULAR;
 }
@@ -336,6 +350,7 @@ runButton.addEventListener("click", async function () {
     verticalDiv.innerText = "";
     mHorizontal = 0;
     horizontalDiv.innerText = "";
+    sayDiv.innerText = "...";
     forcestop = false;
 
     readVar();
@@ -357,6 +372,7 @@ stopButton.addEventListener("click", function () {
         verticalDiv.innerText = "";
         mHorizontal = 0;
         horizontalDiv.innerText = "";
+        sayDiv.innerText = "...";
         forcestop = true;
     }
 
