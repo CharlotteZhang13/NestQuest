@@ -37,6 +37,12 @@ function replaceElement(htmlString) {
 socket.on("receiveVar", (data) => {
     oldChild = document.getElementById("var_menu");
     replaceElement(data.newVar);
+    addVar();
+})
+
+socket.on("receiveCode", (data) => {
+    oldChild = document.getElementById("main");
+    replaceElement(data.newCode);
 })
 
 document.getElementById("createbtn").addEventListener("click", function () {

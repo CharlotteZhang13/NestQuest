@@ -38,9 +38,14 @@ io.on('connection', (socket) =>{
     })
 
     socket.on("updateVar", (data) => {
-        console.log(data.newVar);
         io.to(data.roomUniqueId).emit("receiveVar", {
             newVar: data.newVar
+        });
+    })
+
+    socket.on("updateCode", (data) => {
+        io.to(data.roomUniqueId).emit("receiveCode", {
+            newVar: data.newCode
         });
     })
 })

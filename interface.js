@@ -71,6 +71,7 @@ function setEditable() {
 
         i.ondrop = e => {
             e.preventDefault();
+
             if (i != currentItem && !currentItem.contains(i)) {
 
                 sibling = currentItem.nextSibling;
@@ -100,6 +101,11 @@ function setEditable() {
                 setDropdowns();
                 setIgnore(false, ".ignore");
                 setEditable();
+
+                socket.emit("updateCode", {
+                    newCode: document.getElementById("main").outerHTML,
+                    roomUniqueId: roomUniqueId
+                });
             }
 
             e.stopPropagation()
@@ -148,6 +154,11 @@ function setTrashTriggers(target) {
         slistAll.forEach(slist => {
             setSlistTriggers(slist);
         })
+
+        socket.emit("updateCode", {
+            newCode: document.getElementById("main").outerHTML,
+            roomUniqueId: roomUniqueId
+        });
 
         e.stopPropagation();
     }
@@ -248,6 +259,11 @@ function setSlistTriggers(target) {
                 setIgnore(false, ".ignore"); //恢复element子元素的点击事件
                 setIgnore(false, ".editable");
                 setEditable();
+
+                socket.emit("updateCode", {
+                    newCode: document.getElementById("main").outerHTML,
+                    roomUniqueId: roomUniqueId
+                });
             }
             e.stopPropagation()
         };
@@ -269,7 +285,6 @@ function addVar(){
             setSlistTriggers(slist);
         })
 
-        console.log("updateVar");
         socket.emit("updateVar", {
             newVar: document.getElementById("var_menu").outerHTML,
             roomUniqueId: roomUniqueId
