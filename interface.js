@@ -233,6 +233,11 @@ function setSlistTriggers(target) {
                 })
             }
             trashDiv.classList.remove("active");
+
+            socket.emit("updateCode", {
+                newCode: document.getElementById("main").outerHTML,
+                roomUniqueId: roomUniqueId
+            });
             e.stopPropagation();
         };
 
@@ -259,12 +264,12 @@ function setSlistTriggers(target) {
                 setIgnore(false, ".ignore"); //恢复element子元素的点击事件
                 setIgnore(false, ".editable");
                 setEditable();
-
-                socket.emit("updateCode", {
-                    newCode: document.getElementById("main").outerHTML,
-                    roomUniqueId: roomUniqueId
-                });
             }
+
+            socket.emit("updateCode", {
+                newCode: document.getElementById("main").outerHTML,
+                roomUniqueId: roomUniqueId
+            });
             e.stopPropagation()
         };
     }

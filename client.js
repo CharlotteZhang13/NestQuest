@@ -10,9 +10,7 @@ socket.on("newEditor", (data) => {
     copyButton.innerText = 'Copy Code';
     copyButton.addEventListener('click', () => {
         navigator.clipboard.writeText(roomUniqueId).then(function() {
-            console.log('Async: Copying to clipboard was successful!');
         }, function(err) {
-            console.error('Async: Could not copy text: ', err);
         });
     });
     document.getElementById('idarea').innerHTML = `Please share code ${roomUniqueId} for joint editing`;
@@ -41,8 +39,17 @@ socket.on("receiveVar", (data) => {
 })
 
 socket.on("receiveCode", (data) => {
+    console.log(data.newCode);
+
     oldChild = document.getElementById("main");
     replaceElement(data.newCode);
+
+    slistAll = document.querySelectorAll(".slist")
+    slistAll.forEach(slist => {
+        setSlistTriggers(slist);
+    })
+    setDropdowns();
+    setEditable();
 })
 
 document.getElementById("createbtn").addEventListener("click", function () {
