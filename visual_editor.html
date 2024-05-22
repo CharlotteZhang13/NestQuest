@@ -15,12 +15,13 @@
 <body>
     <div id="init">
         <img src="cat_img.png" width=150px>
-        <button onclick="createEditor()">Create Editor</button> 
+        <button id="createbtn">Create Editor</button> 
         <div>or</div>
         <input placeholder="Enter Code" type="text" id="roomUniqueId" />
-        <button onclick="joinEditor()">Join Editor</button>
+        <button id="joinbtn">Join Editor</button>
     </div>
     <div id="editor">
+        <div id="idarea"></div>
         <button id="run">
             <svg t="1714443319787" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
                 p-id="1542" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="23">
@@ -155,7 +156,7 @@
                     </div>
                     <p class="editable" contenteditable="true">100</p>
                 </div>
-                <button id="add_var">Add variable</button>
+                <button class="add_var">Add variable</button>
             </ul>
             <ul class="slist element" id="main">
                 main
