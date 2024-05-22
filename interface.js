@@ -255,7 +255,7 @@ function setSlistTriggers(target) {
 }
 
 function addVar(){
-    var addVarBtn = document.getElementById("add_var");
+    var addVarBtn = document.querySelector(".add_var");
     addVarBtn.addEventListener("click", function () {
         var cloned = addVarBtn.previousElementSibling.cloneNode(true);
         var name = cloned.querySelector(".name");
@@ -268,6 +268,12 @@ function addVar(){
         slistAll.forEach(slist => {
             setSlistTriggers(slist);
         })
+
+        console.log("updateVar");
+        socket.emit("updateVar", {
+            newVar: document.getElementById("var_menu").outerHTML,
+            roomUniqueId: roomUniqueId
+        });
     });
 } 
 
