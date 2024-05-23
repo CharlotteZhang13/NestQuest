@@ -1,3 +1,4 @@
+
 let slistAll = document.querySelectorAll(".slist"),
     mainSlist = document.getElementById("main"),
     trashDiv = document.getElementById("trash"),
@@ -45,12 +46,29 @@ function setSlistPlaceholders(target) {
     target.appendChild(placeHolder);
 }
 
+function emitContent()
+{
+    socket.emit("updateCode", {
+        newCode: document.getElementById("main").outerHTML,
+        roomUniqueId: roomUniqueId
+    });
+    socket.emit("updateVar", {
+        newVar: document.getElementById("var_menu").outerHTML,
+        roomUniqueId: roomUniqueId
+    });
+}
+
 function setEditable() {
     editable = document.querySelectorAll(".editable");
 
     for (let i of editable) {
 
         mainSlist = document.getElementById("main");
+
+        i.addEventListener('blur', () => {
+            emitContent();
+        });
+
         if (!mainSlist.contains(i)) continue;
 
         i.ondragenter = e => {
@@ -71,6 +89,7 @@ function setEditable() {
 
         i.ondrop = e => {
             e.preventDefault();
+
             if (i != currentItem && !currentItem.contains(i)) {
 
                 sibling = currentItem.nextSibling;
@@ -100,6 +119,8 @@ function setEditable() {
                 setDropdowns();
                 setIgnore(false, ".ignore");
                 setEditable();
+
+                emitContent();
             }
 
             e.stopPropagation()
@@ -148,6 +169,8 @@ function setTrashTriggers(target) {
         slistAll.forEach(slist => {
             setSlistTriggers(slist);
         })
+
+        emitContent();
 
         e.stopPropagation();
     }
@@ -222,6 +245,8 @@ function setSlistTriggers(target) {
                 })
             }
             trashDiv.classList.remove("active");
+
+            emitContent();
             e.stopPropagation();
         };
 
@@ -249,6 +274,8 @@ function setSlistTriggers(target) {
                 setIgnore(false, ".editable");
                 setEditable();
             }
+
+            emitContent();
             e.stopPropagation()
         };
     }
@@ -269,11 +296,7 @@ function addVar(){
             setSlistTriggers(slist);
         })
 
-        console.log("updateVar");
-        socket.emit("updateVar", {
-            newVar: document.getElementById("var_menu").outerHTML,
-            roomUniqueId: roomUniqueId
-        });
+        emitContent();
     });
 } 
 

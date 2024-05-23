@@ -20,7 +20,6 @@ app.get('/', (req, res) =>{
 
 io.on('connection', (socket) =>{
     socket.on('disconnect', () =>{
-        console.log("user disconnected");
     })
     
     socket.on("createEditor", () => {
@@ -38,9 +37,14 @@ io.on('connection', (socket) =>{
     })
 
     socket.on("updateVar", (data) => {
-        console.log(data.newVar);
         io.to(data.roomUniqueId).emit("receiveVar", {
             newVar: data.newVar
+        });
+    })
+
+    socket.on("updateCode", (data) => {
+        io.to(data.roomUniqueId).emit("receiveCode", {
+            newCode: data.newCode
         });
     })
 })
