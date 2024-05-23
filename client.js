@@ -39,7 +39,6 @@ socket.on("receiveVar", (data) => {
 })
 
 socket.on("receiveCode", (data) => {
-    console.log(data.newCode);
 
     oldChild = document.getElementById("main");
     replaceElement(data.newCode);
@@ -49,6 +48,7 @@ socket.on("receiveCode", (data) => {
         setSlistTriggers(slist);
     })
     setDropdowns();
+
     setEditable();
 })
 

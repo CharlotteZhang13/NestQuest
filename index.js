@@ -43,7 +43,6 @@ io.on('connection', (socket) =>{
     })
 
     socket.on("updateCode", (data) => {
-        console.log(data.newCode);
         io.to(data.roomUniqueId).emit("receiveCode", {
             newCode: data.newCode
         });

@@ -1,3 +1,4 @@
+
 let slistAll = document.querySelectorAll(".slist"),
     mainSlist = document.getElementById("main"),
     trashDiv = document.getElementById("trash"),
@@ -45,12 +46,29 @@ function setSlistPlaceholders(target) {
     target.appendChild(placeHolder);
 }
 
+function emitContent()
+{
+    socket.emit("updateCode", {
+        newCode: document.getElementById("main").outerHTML,
+        roomUniqueId: roomUniqueId
+    });
+    socket.emit("updateVar", {
+        newVar: document.getElementById("var_menu").outerHTML,
+        roomUniqueId: roomUniqueId
+    });
+}
+
 function setEditable() {
     editable = document.querySelectorAll(".editable");
 
     for (let i of editable) {
 
         mainSlist = document.getElementById("main");
+
+        i.addEventListener('blur', () => {
+            emitContent();
+        });
+
         if (!mainSlist.contains(i)) continue;
 
         i.ondragenter = e => {
@@ -102,10 +120,7 @@ function setEditable() {
                 setIgnore(false, ".ignore");
                 setEditable();
 
-                socket.emit("updateCode", {
-                    newCode: document.getElementById("main").outerHTML,
-                    roomUniqueId: roomUniqueId
-                });
+                emitContent();
             }
 
             e.stopPropagation()
@@ -155,10 +170,7 @@ function setTrashTriggers(target) {
             setSlistTriggers(slist);
         })
 
-        socket.emit("updateCode", {
-            newCode: document.getElementById("main").outerHTML,
-            roomUniqueId: roomUniqueId
-        });
+        emitContent();
 
         e.stopPropagation();
     }
@@ -234,10 +246,7 @@ function setSlistTriggers(target) {
             }
             trashDiv.classList.remove("active");
 
-            socket.emit("updateCode", {
-                newCode: document.getElementById("main").outerHTML,
-                roomUniqueId: roomUniqueId
-            });
+            emitContent();
             e.stopPropagation();
         };
 
@@ -266,10 +275,7 @@ function setSlistTriggers(target) {
                 setEditable();
             }
 
-            socket.emit("updateCode", {
-                newCode: document.getElementById("main").outerHTML,
-                roomUniqueId: roomUniqueId
-            });
+            emitContent();
             e.stopPropagation()
         };
     }
@@ -290,10 +296,7 @@ function addVar(){
             setSlistTriggers(slist);
         })
 
-        socket.emit("updateVar", {
-            newVar: document.getElementById("var_menu").outerHTML,
-            roomUniqueId: roomUniqueId
-        });
+        emitContent();
     });
 } 
 
