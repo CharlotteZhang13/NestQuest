@@ -1,8 +1,11 @@
 const socket = io();
 var roomUniqueId;
+var roomCnt;
+var his = 0;
 
 socket.on("newEditor", (data) => {
     roomUniqueId = data.roomUniqueId;
+    roomCnt = data.roomCnt;
     document.getElementById('init').style.display = 'none';
     document.getElementById('editor').style.display = 'block';
     let copyButton = document.createElement('button');
@@ -32,23 +35,20 @@ function replaceElement(htmlString) {
     }
 }
 
-socket.on("receiveVar", (data) => {
-    oldChild = document.getElementById("var_menu");
-    replaceElement(data.newVar);
-    addVar();
-})
-
 socket.on("receiveCode", (data) => {
 
-    oldChild = document.getElementById("main");
+    his = data.his;
+    console.log(his);
+
     replaceElement(data.newCode);
+    replaceElement(data.newVar);
 
     slistAll = document.querySelectorAll(".slist")
     slistAll.forEach(slist => {
         setSlistTriggers(slist);
     })
     setDropdowns();
-
+    addVar();
     setEditable();
 })
 
@@ -60,3 +60,10 @@ document.getElementById("joinbtn").addEventListener("click", function () {
     roomUniqueId = document.getElementById('roomUniqueId').value;
     socket.emit('joinEditor', {roomUniqueId: roomUniqueId});
 })
+
+document.getElementById("revoke").addEventListener("click", function () {
+    socket.emit('revoke', {
+        roomUniqueId: roomUniqueId,
+        his: his
+    });
+});

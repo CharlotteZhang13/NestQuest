@@ -50,11 +50,9 @@ function emitContent()
 {
     socket.emit("updateCode", {
         newCode: document.getElementById("main").outerHTML,
-        roomUniqueId: roomUniqueId
-    });
-    socket.emit("updateVar", {
         newVar: document.getElementById("var_menu").outerHTML,
-        roomUniqueId: roomUniqueId
+        roomUniqueId: roomUniqueId,
+        roomCnt: roomCnt
     });
 }
 
@@ -275,7 +273,7 @@ function setSlistTriggers(target) {
                 setEditable();
             }
 
-            emitContent();
+            // emitContent();
             e.stopPropagation()
         };
     }
