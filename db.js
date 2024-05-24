@@ -16,12 +16,20 @@ async function createRoom(roomUniqueId){
     return rows[0].RoomCnt;
 }
 
-async function addHistory(roomCnt, roomUniqueId, newVar, newCode){
+async function addHistory(roomCnt, roomUniqueId, newVar, newCode, his){
+    if(his != -1){
+        var [old_rows] = await pool.query('SELECT * FROM Histories WHERE RoomID = ? ORDER BY HistoryCnt ASC', [roomUniqueId]);
+        if(his != old_rows.length - 1){
+            for(var i = his + 1; i < old_rows.length; i++){
+                await pool.query('DELETE FROM Histories WHERE HistoryCnt = ?', [old_rows[i].HistoryCnt]);
+            }
+        }
+    }
     await pool.query(
         'INSERT INTO Histories (Variable, Code, RoomCnt, RoomID) VALUES (?, ?, ?, ?)',
         [newVar, newCode, roomCnt, roomUniqueId]
     )
-    const [rows] = await pool.query('SELECT * FROM Histories WHERE RoomID = ?', [roomUniqueId]);
+    const [rows] = await pool.query('SELECT * FROM Histories WHERE RoomID = ? ORDER BY HistoryCnt ASC', [roomUniqueId]);
     return rows.length - 1;
 }
 
@@ -36,10 +44,22 @@ async function revokeHistory(roomUniqueId, his){
     return s;
 }
 
+async function restoreHistory(roomUniqueId, his){
+    const [rows] = await pool.query('SELECT * FROM Histories WHERE RoomID = ? ORDER BY HistoryCnt ASC', [roomUniqueId]);
+    his = his < rows.length - 1? his + 1 : rows.length - 1;
+    var s = {
+        variable: rows[his].Variable,
+        code: rows[his].Code,
+        his: his
+    }
+    return s;
+}
+
 module.exports = {
     createRoom,
     addHistory,
-    revokeHistory
+    revokeHistory,
+    restoreHistory
 };
 
 

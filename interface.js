@@ -35,7 +35,6 @@ function setDropdowns() {
         });
     });
 }
-
 //给列表元素添加placeholder，这样可以往placeholder上拖元素
 function setSlistPlaceholders(target) {
     if (target.id == "menu" || target.id == "trash" || target.id == "var_menu") return;
@@ -46,15 +45,6 @@ function setSlistPlaceholders(target) {
     target.appendChild(placeHolder);
 }
 
-function emitContent()
-{
-    socket.emit("updateCode", {
-        newCode: document.getElementById("main").outerHTML,
-        newVar: document.getElementById("var_menu").outerHTML,
-        roomUniqueId: roomUniqueId,
-        roomCnt: roomCnt
-    });
-}
 
 function setEditable() {
     editable = document.querySelectorAll(".editable");
@@ -91,10 +81,10 @@ function setEditable() {
             if (i != currentItem && !currentItem.contains(i)) {
 
                 sibling = currentItem.nextSibling;
-                while (sibling && sibling.nodeType !== 1) { 
+                while (sibling && sibling.nodeType !== 1) {
                     sibling = sibling.nextSibling;
                 }
-                if(sibling != null && sibling.classList.contains("editable")){
+                if (sibling != null && sibling.classList.contains("editable")) {
                     previousEditable = sibling;
                 } else {
                     previousEditable = null;
@@ -109,6 +99,13 @@ function setEditable() {
                     var cloned = currentItem.cloneNode(true);
                     i.parentNode.insertBefore(cloned, i);
                 }
+
+
+                editable = document.querySelectorAll(".editable");
+                editable.forEach(ed => {
+                    ed.classList.remove("hint");
+                    ed.classList.remove("active");
+                })
 
 
                 slistAll.forEach(slist => {
@@ -145,10 +142,10 @@ function setTrashTriggers(target) {
 
         if (currentItem.classList.contains("bool")) {
             sibling = currentItem.nextSibling;
-            while (sibling && sibling.nodeType !== 1) { 
+            while (sibling && sibling.nodeType !== 1) {
                 sibling = sibling.nextSibling;
             }
-            if(sibling != null && sibling.classList.contains("editable")){
+            if (sibling != null && sibling.classList.contains("editable")) {
                 previousEditable = sibling;
             } else {
                 previousEditable = null;
@@ -161,6 +158,24 @@ function setTrashTriggers(target) {
         mainSlist = document.getElementById("main")
         if (mainSlist.contains(currentItem)) {
             currentItem.parentNode.removeChild(currentItem);
+        }
+
+
+        if (currentItem.classList.contains("bool")) {
+            editable = document.querySelectorAll(".editable");
+            editable.forEach(ed => {
+                ed.classList.remove("hint");
+                ed.classList.remove("active");
+            })
+        } else {
+            //拖拽结束就去除所有的hint和标红
+            slistAll.forEach(slist => {
+                let query = slist.querySelectorAll(".element");
+                for (let it of query) {
+                    it.classList.remove("hint");
+                    it.classList.remove("active");
+                }
+            })
         }
 
         slistAll = document.querySelectorAll(".slist")
@@ -244,7 +259,6 @@ function setSlistTriggers(target) {
             }
             trashDiv.classList.remove("active");
 
-            emitContent();
             e.stopPropagation();
         };
 
@@ -263,6 +277,15 @@ function setSlistTriggers(target) {
                     }
                 }
 
+                slistAll.forEach(slist => {
+                    let query = slist.querySelectorAll(".element");
+                    for (let it of query) {
+                        it.classList.remove("hint");
+                        it.classList.remove("active");
+                    }
+                })
+                trashDiv.classList.remove("active");
+
                 //新复制出来的slist也都要设置一遍
                 slistAll.forEach(slist => {
                     setSlistTriggers(slist);
@@ -273,13 +296,13 @@ function setSlistTriggers(target) {
                 setEditable();
             }
 
-            // emitContent();
+            emitContent();
             e.stopPropagation()
         };
     }
 }
 
-function addVar(){
+function addVar() {
     var addVarBtn = document.querySelector(".add_var");
     addVarBtn.addEventListener("click", function () {
         var cloned = addVarBtn.previousElementSibling.cloneNode(true);
@@ -296,7 +319,7 @@ function addVar(){
 
         emitContent();
     });
-} 
+}
 
 slistAll.forEach(slist => {
     setSlistPlaceholders(slist);

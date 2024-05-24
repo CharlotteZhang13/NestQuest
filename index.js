@@ -5,7 +5,7 @@ const path = require('path');
 const server = http.createServer(app);
 const {Server} = require("socket.io");
 const io = new Server(server);
-const { createRoom, addHistory, revokeHistory } = require('./db');
+const { createRoom, addHistory, revokeHistory, restoreHistory} = require('./db');
 
 const rooms = {};
 
@@ -20,8 +20,6 @@ app.get('/', (req, res) =>{
 })
 
 io.on('connection', (socket) =>{
-    socket.on('disconnect', () =>{
-    })
     
     socket.on("createEditor", async function() {
         const roomUniqueId = makeid(6);
@@ -42,7 +40,7 @@ io.on('connection', (socket) =>{
     })
 
     socket.on("updateCode", async function(data) {
-        var his = await addHistory(data.roomCnt, data.roomUniqueId, data.newVar, data.newCode);
+        var his = await addHistory(data.roomCnt, data.roomUniqueId, data.newVar, data.newCode, data.his);
         io.to(data.roomUniqueId).emit("receiveCode", {
             newCode: data.newCode,
             newVar: data.newVar,
@@ -52,7 +50,15 @@ io.on('connection', (socket) =>{
 
     socket.on("revoke", async function(data) {
         var r = await revokeHistory(data.roomUniqueId, data.his);
-        console.log(r);
+        io.to(data.roomUniqueId).emit("receiveCode", {
+            newCode: r.code,
+            newVar: r.variable,
+            his: r.his
+        });
+    })
+
+    socket.on("restore", async function(data) {
+        var r = await restoreHistory(data.roomUniqueId, data.his);
         io.to(data.roomUniqueId).emit("receiveCode", {
             newCode: r.code,
             newVar: r.variable,
