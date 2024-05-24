@@ -294,9 +294,18 @@ function setSlistTriggers(target) {
                 setIgnore(false, ".ignore"); //恢复element子元素的点击事件
                 setIgnore(false, ".editable");
                 setEditable();
+
+                emitContent();
+
+            } else {
+                editable = document.querySelectorAll(".editable");
+                editable.forEach(ed => {
+                    ed.classList.remove("hint");
+                    ed.classList.remove("active");
+                })
+                trashDiv.classList.remove("active");
             }
 
-            emitContent();
             e.stopPropagation()
         };
     }
