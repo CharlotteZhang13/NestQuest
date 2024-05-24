@@ -13,11 +13,32 @@ function emitContent() {
     });
 }
 
+socket.on("fetch", () => {
+    emitContent();
+})
+
 socket.on("newEditor", (data) => {
     roomUniqueId = data.roomUniqueId;
     roomCnt = data.roomCnt;
 
     emitContent();
+
+    document.getElementById('init').style.display = 'none';
+    document.getElementById('editor').style.display = 'block';
+    let copyButton = document.createElement('button');
+    copyButton.style.display = 'block';
+    copyButton.innerText = 'Copy Code';
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(roomUniqueId).then(function() {
+        }, function(err) {
+        });
+    });
+    document.getElementById('idarea').innerHTML = `Please share code ${roomUniqueId} for joint editing`;
+    document.getElementById('idarea').appendChild(copyButton);
+});
+
+socket.on("renewEditor", (data) => {
+    roomUniqueId = data.roomUniqueId;
 
     document.getElementById('init').style.display = 'none';
     document.getElementById('editor').style.display = 'block';
@@ -50,8 +71,9 @@ function replaceElement(htmlString) {
 
 socket.on("receiveCode", (data) => {
 
+    roomCnt = data.roomCnt;
     his = data.his;
-    console.log(his);
+    console.log(roomCnt);
 
     replaceElement(data.newCode);
     replaceElement(data.newVar);

@@ -35,13 +35,15 @@ io.on('connection', (socket) =>{
     socket.on('joinEditor', (data) => {
         if(rooms[data.roomUniqueId] != null) {
             socket.join(data.roomUniqueId);
-            socket.emit("newEditor", {roomUniqueId: data.roomUniqueId})
+            socket.emit("renewEditor", {roomUniqueId: data.roomUniqueId})
+            io.to(data.roomUniqueId).emit("fetch");
         }
     })
 
     socket.on("updateCode", async function(data) {
         var his = await addHistory(data.roomCnt, data.roomUniqueId, data.newVar, data.newCode, data.his);
         io.to(data.roomUniqueId).emit("receiveCode", {
+            roomCnt: data.roomCnt,
             newCode: data.newCode,
             newVar: data.newVar,
             his: his
