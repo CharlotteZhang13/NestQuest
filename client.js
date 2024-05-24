@@ -1,11 +1,45 @@
 const socket = io();
 var roomUniqueId;
 var roomCnt;
-var his = 0;
+var his = -1;
+
+function emitContent() {
+    socket.emit("updateCode", {
+        newCode: document.getElementById("main").outerHTML,
+        newVar: document.getElementById("var_menu").outerHTML,
+        roomUniqueId: roomUniqueId,
+        roomCnt: roomCnt,
+        his: his
+    });
+}
+
+socket.on("fetch", () => {
+    emitContent();
+})
 
 socket.on("newEditor", (data) => {
     roomUniqueId = data.roomUniqueId;
     roomCnt = data.roomCnt;
+
+    emitContent();
+
+    document.getElementById('init').style.display = 'none';
+    document.getElementById('editor').style.display = 'block';
+    let copyButton = document.createElement('button');
+    copyButton.style.display = 'block';
+    copyButton.innerText = 'Copy Code';
+    copyButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(roomUniqueId).then(function() {
+        }, function(err) {
+        });
+    });
+    document.getElementById('idarea').innerHTML = `Please share code ${roomUniqueId} for joint editing`;
+    document.getElementById('idarea').appendChild(copyButton);
+});
+
+socket.on("renewEditor", (data) => {
+    roomUniqueId = data.roomUniqueId;
+
     document.getElementById('init').style.display = 'none';
     document.getElementById('editor').style.display = 'block';
     let copyButton = document.createElement('button');
@@ -37,8 +71,9 @@ function replaceElement(htmlString) {
 
 socket.on("receiveCode", (data) => {
 
+    roomCnt = data.roomCnt;
     his = data.his;
-    console.log(his);
+    console.log(roomCnt);
 
     replaceElement(data.newCode);
     replaceElement(data.newVar);
@@ -63,6 +98,13 @@ document.getElementById("joinbtn").addEventListener("click", function () {
 
 document.getElementById("revoke").addEventListener("click", function () {
     socket.emit('revoke', {
+        roomUniqueId: roomUniqueId,
+        his: his
+    });
+});
+
+document.getElementById("restore").addEventListener("click", function () {
+    socket.emit('restore', {
         roomUniqueId: roomUniqueId,
         his: his
     });
