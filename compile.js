@@ -335,7 +335,7 @@ async function runTokens() {
     } else if (token.name == "Say") {
         await func_combiner(func_say)(token.val_04);
     }
-    await func_combiner(func_wait)(300);
+    await func_combiner(func_wait)(7);
 
     return returnVal.REGULAR;
 }
