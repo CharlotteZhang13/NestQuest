@@ -3,6 +3,7 @@ var varList = [];
 var t_idx = 0;
 var timeout = 0;
 var displayNum = 0;
+var rotateAngle = 0;
 var runButton = document.getElementById("run");
 var stopButton = document.getElementById("stop");
 var displayDiv = document.getElementById("display");
@@ -14,6 +15,7 @@ var tokenIdx = 0;
 var verticalDiv = document.getElementById("verticalmoves")
 var horizontalDiv = document.getElementById("horizontalmoves")
 var sayDiv = document.getElementById("talks")
+var rotateDiv = document.getElementById("pic_rotate");
 
 returnVal = {
     END: 0,
@@ -114,6 +116,12 @@ function readTokens(item) {
         func.name = "Say";
         editable = item.querySelector(".editable");
         func.val_04 = editable.textContent;
+    }
+    else if (item.classList.contains("RotateLeft")) {
+        func.name = "RotateLeft";
+    }
+    else if (item.classList.contains("RotateRight")) {
+        func.name = "RotateRight";
     }
 
     return func;
@@ -306,6 +314,20 @@ async function func_say(str) {
 }
 //func_say("hihihihihihihihi");
 
+async function func_rotate_left() {
+    rotateAngle -= 90;
+    strAngle = 'rotate(' + rotateAngle.toString() + 'deg)'
+    rotateDiv.style.transform = strAngle;
+    // rotateDiv.style.transform *= n;
+}
+async function func_rotate_right() {
+    rotateAngle += 90;
+    strAngle = 'rotate(' + rotateAngle.toString() + 'deg)'
+    rotateDiv.style.transform = strAngle;
+    // rotateDiv.style.transform *= n;
+}
+// func_rotate_left()
+
 async function runTokens() {
 
     var token = funcTokens[t_idx];
@@ -334,6 +356,10 @@ async function runTokens() {
         await func_combiner(func_horizontal_move)(token.val_01);
     } else if (token.name == "Say") {
         await func_combiner(func_say)(token.val_04);
+    } else if (token.name == "RotateLeft") {
+        await func_rotate_left()
+    } else if (token.name == "RotateRight") {
+        await func_rotate_right()
     }
     await func_combiner(func_wait)(300);
 
@@ -349,8 +375,10 @@ runButton.addEventListener("click", async function () {
     mVertical = 0;
     verticalDiv.innerText = "";
     mHorizontal = 0;
+    rotateAngle = 0;
     horizontalDiv.innerText = "";
     sayDiv.innerText = "...";
+    rotateDiv.style.transform = "rotate(0)"
     forcestop = false;
 
     readVar();
@@ -371,8 +399,10 @@ stopButton.addEventListener("click", function () {
         mVertical = 0;
         verticalDiv.innerText = "";
         mHorizontal = 0;
+        rotateAngle = 0;
         horizontalDiv.innerText = "";
         sayDiv.innerText = "...";
+        rotateDiv.style.transform = "rotate(0)"
         forcestop = true;
     }
 
